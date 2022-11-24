@@ -6,20 +6,20 @@
 #include "mbed.h"
 
 #define WAIT_TIME_MS 500
-DigitalOut led1(PA_12);
+DigitalOut led1(PA_10);
 DigitalIn boton(PC_2);
 
 int botonAnterior = 0;
-static BufferedSerial serial_port(PC_12, PD_2,9600);
+static UnbufferedSerial serial_port(PC_12, PD_2,9600);
 
-char datoRx;
+char datoRx[1];
 char datoTx;
 
 
 
 
 int main() {
-
+    serial_port.set_blocking(false);
  
   printf("Iniciado\n");
 
@@ -29,14 +29,15 @@ int main() {
       serial_port.write(&datoTx, 1);
       printf("Mensaje enviado\n");
     }
-    if(serial_port.readable()){
-         char c;
-        serial_port.read(&c, 1);
-        printf("dato\n");
-
-    }
+    
+    if(serial_port.readable()==true){
+        serial_port.read(&datoRx, 1);
+        led1=!led1;
+        printf("dato %s\n",datoRx);
+  }
+  
 
     botonAnterior = boton;
-    thread_sleep_for(10);
+    wait_us(1000);
   }
 }
